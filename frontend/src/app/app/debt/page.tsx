@@ -39,7 +39,7 @@ export default function DebtPage() {
           </span>
           <h3 className="mt-4 text-lg font-medium">No debt accounts linked</h3>
           <p className="mt-1 max-w-sm text-sm text-fg-muted">
-            Connect a bank with loans or credit cards and MoneyWealth AI will map your payoff path and the
+            Connect a bank with loans or credit cards and MoneyWealth AI will map a payoff path and the
             interest you could save.
           </p>
           <Button className="mt-5">

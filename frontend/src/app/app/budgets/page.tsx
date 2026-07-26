@@ -153,7 +153,7 @@ function EmptyState({ onNew }: { onNew: () => void }) {
       </span>
       <h3 className="mt-4 text-lg font-medium">No budgets yet</h3>
       <p className="mt-1 max-w-xs text-sm text-fg-muted">
-        Set a monthly limit for a category and MoneyWealth AI will track your pace.
+        Set a monthly limit for any category and MoneyWealth AI will track your pace.
       </p>
       <Button className="mt-5" onClick={onNew}>
         <Plus className="size-4" /> Create your first budget
