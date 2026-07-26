@@ -22,6 +22,7 @@ const SUGGESTIONS = [
   "What should I focus on to hit my goals faster?",
   "Where is most of my money going?",
   "Help me build a debt payoff plan.",
+  "Plan me a perfect budgeting plan to manage expenses properly"
 ];
 
 export default function AdvisorPage() {
