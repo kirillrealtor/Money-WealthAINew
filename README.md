@@ -51,7 +51,6 @@ Browser ──► Vercel (Next.js 16 frontend + BFF)  ──►  AWS ECS Fargate
 ├── .github/workflows/    CI (lint/type/test/AI-eval) + auto-deploy (backend ECS, frontend Vercel)
 ├── DEPLOY.md             legacy runbook (superseded — see DEVOPS_HANDOFF.md)
 ├── DEVOPS_HANDOFF.md     authoritative deploy guide (ECS + Aurora)
-├── backend/AURORA_MIGRATION_PROGRESS.txt  Aurora cutover log (complete)
 └── docker-compose.yml    local Postgres + Redis
 ```
 
@@ -109,8 +108,7 @@ the frontend to Vercel (and the backend to ECS once AWS secrets are set).
 
 Live today on **AWS (ECS Fargate + Aurora PostgreSQL + RDS Proxy + SSM) + Upstash Redis + Vercel**.
 Infrastructure is **Terraform** in [infra/terraform/](infra/terraform/).
-Deploy runbook: [DEVOPS_HANDOFF.md](DEVOPS_HANDOFF.md). Aurora cutover log:
-[backend/AURORA_MIGRATION_PROGRESS.txt](backend/AURORA_MIGRATION_PROGRESS.txt).
+Deploy runbook: [DEVOPS_HANDOFF.md](DEVOPS_HANDOFF.md).
 
 ## Status
 

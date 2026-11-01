@@ -6,10 +6,6 @@ export function authMode(): AuthMode {
   return mode === "magic_link" ? "magic_link" : "password";
 }
 
-export function isPasswordAuth(): boolean {
-  return authMode() === "password";
-}
-
 export function isMagicLinkAuth(): boolean {
   return authMode() === "magic_link";
 }

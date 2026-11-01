@@ -34,6 +34,9 @@ const nextConfig: NextConfig = {
   // Don't advertise the framework/version (info disclosure).
   poweredByHeader: false,
   reactStrictMode: true,
+  turbopack: {
+    root: process.cwd(),
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

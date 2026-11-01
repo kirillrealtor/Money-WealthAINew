@@ -1,8 +1,7 @@
 # MoneyWealth AI — Backend
 
 Python / FastAPI backend (async). PostgreSQL (asyncpg, FORCE RLS) + Redis.
-Built per [docs/BACKEND_ARCHITECTURE.md](docs/BACKEND_ARCHITECTURE.md) on the
-build order in [docs/BUILD_SEQUENCE.md](docs/BUILD_SEQUENCE.md).
+Design notes in [docs/BACKEND_ARCHITECTURE.md](docs/BACKEND_ARCHITECTURE.md).
 
 > **Stack note:** Backend is Python (FastAPI). Frontend is TypeScript (Next.js).
 > Python is the primary application language; if/when heavy quant or ML work
@@ -14,7 +13,6 @@ in ECR; the task-definition template is in [`deploy/task-definition.json`](deplo
 and the push→ECR→ECS pipeline in [`../.github/workflows/deploy-backend.yml`](../.github/workflows/deploy-backend.yml).
 Infrastructure (VPC, ALB, Aurora, RDS Proxy, autoscaling) is **Terraform** in
 [`../infra/terraform/`](../infra/terraform/). Runbook: [`../DEVOPS_HANDOFF.md`](../DEVOPS_HANDOFF.md).
-Aurora cutover log: [`AURORA_MIGRATION_PROGRESS.txt`](AURORA_MIGRATION_PROGRESS.txt).
 
 ## Status
 - ✅ **Phase 0** — scaffold, config, asyncpg pool (RDS-Proxy-ready), SQL migrations, structlog, tracing, health

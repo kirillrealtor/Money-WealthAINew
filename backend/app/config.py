@@ -126,7 +126,6 @@ class Settings(BaseSettings):
     login_captcha_after_fails: int = 3
 
     rate_limit_general_per_min: int = 100
-    rate_limit_ai_per_min: int = 10
     # Per-user limit for cheap authenticated reads (dashboards). High enough not
     # to bother real UIs, low enough to cap scraping/abuse on unmetered GETs.
     rate_limit_read_per_min: int = 120
@@ -226,21 +225,6 @@ class Settings(BaseSettings):
             or self.grok_configured
             or self.gemini_configured
         )
-
-    def token_budget_for(self, tier: str) -> int:
-        return {
-            "free": self.token_budget_free,
-            "plus": self.token_budget_plus,
-            "premium": self.token_budget_premium,
-        }.get(tier, self.token_budget_free)
-
-    @property
-    def plaid_base_url(self) -> str:
-        return {
-            "sandbox": "https://sandbox.plaid.com",
-            "development": "https://development.plaid.com",
-            "production": "https://production.plaid.com",
-        }[self.plaid_env]
 
     @property
     def plaid_products_list(self) -> list[str]:

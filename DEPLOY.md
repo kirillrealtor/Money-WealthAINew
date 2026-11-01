@@ -10,7 +10,6 @@
 |-----|---------|
 | **[DEVOPS_HANDOFF.md](DEVOPS_HANDOFF.md)** | Authoritative deploy guide (ECS, Aurora, SSM, Vercel) |
 | **[infra/terraform/README.md](infra/terraform/README.md)** | Terraform apply, out-of-band DB setup, troubleshooting |
-| **[backend/AURORA_MIGRATION_PROGRESS.txt](backend/AURORA_MIGRATION_PROGRESS.txt)** | Aurora cutover checklist (completed 2026-06-29) |
 
 ## Current architecture
 

@@ -11,37 +11,10 @@ import {
   Compass,
   Check,
   ShieldCheck,
-  Landmark,
-  Lock,
 } from "lucide-react";
 import { Panel } from "@/components/ui/panel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
-/* ─────────────────────────── Trust / stats strip ─────────────────────────── */
-export function StatsStrip() {
-  const items = [
-    { icon: Landmark, label: "12,000+ banks", sub: "connected via Plaid" },
-    { icon: Lock, label: "256-bit AES", sub: "encrypted at rest" },
-    { icon: Sparkles, label: "Grounded", sub: "every figure cited" },
-    { icon: ShieldCheck, label: "Read-only", sub: "we never move money" },
-  ];
-  return (
-    <div className="mx-auto max-w-5xl px-5">
-      <Panel className="grid grid-cols-2 gap-px overflow-hidden p-0 md:grid-cols-4">
-        {items.map(({ icon: Icon, label, sub }) => (
-          <div key={label} className="flex items-center gap-3 px-5 py-4">
-            <Icon className="size-5 shrink-0 text-brand" />
-            <div>
-              <p className="text-sm font-medium text-fg">{label}</p>
-              <p className="text-xs text-fg-subtle">{sub}</p>
-            </div>
-          </div>
-        ))}
-      </Panel>
-    </div>
-  );
-}
 
 /* ────────────────────────────── How it works ────────────────────────────── */
 export function HowItWorks() {

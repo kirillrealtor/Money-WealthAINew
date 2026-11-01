@@ -38,9 +38,6 @@ export const amountSchema = z
   .refine((v) => Number(v) > 0, "Amount must be greater than zero")
   .refine((v) => Number(v) <= MONEY_MAX, "Amount is too large");
 
-export type LoginInput = z.infer<typeof loginSchema>;
-export type SignupInput = z.infer<typeof signupSchema>;
-
 /**
  * Validate a value against a schema and return a flat field→message map.
  * Framework-agnostic so it works with the existing hand-rolled forms without a
