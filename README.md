@@ -1,39 +1,52 @@
+[![CI](https://github.com/kirillrealtor/Money-WealthAINew/actions/workflows/ci.yml/badge.svg)](https://github.com/kirillrealtor/Money-WealthAINew/actions/workflows/ci.yml)
+
 # MoneyWealth AI
 
-**An AI-native personal finance platform** — connect your real bank accounts and get
-clear, *grounded* guidance: budgets, goals, debt payoff, portfolio health, and an AI
-advisor that cites the data it used and **never invents numbers**.
+An AI-native personal finance platform. Users connect real bank accounts — read-only,
+via Plaid — and receive grounded guidance on budgets, goals, debt payoff, and
+portfolio health, alongside an AI advisor that cites the data behind every figure.
 
-- 🌐 **Live app:** https://moneywealth-ai.vercel.app
-- 🧠 Grounded AI advisor (Groq Llama 3.3 70B / Anthropic Claude) with a real safety stack
-- 🏦 Bank linking via Plaid · 🔒 read-only, encrypted · 📊 budgets, goals, debt, portfolio
-- 🎨 Light **and** dark themes ("Emerald Calm") · ♿ WCAG-minded · 📱 responsive PWA
+**Live:** https://moneywealth-ai.vercel.app
 
-> Monorepo: a Python/FastAPI backend and a Next.js/TypeScript frontend that coordinate
-> through the backend's auto-generated **OpenAPI** contract.
+A monorepo holding a Python/FastAPI backend and a Next.js/TypeScript frontend,
+coordinated through the backend's generated OpenAPI contract.
 
----
-
-## Architecture at a glance
+## Architecture
 
 ```
-Browser ──► Vercel (Next.js 16 frontend + BFF)  ──►  AWS ECS Fargate (FastAPI)
-   only talks to Vercel (same-origin)                 │            │
-   nonce CSP · httpOnly refresh cookie    Aurora PostgreSQL   Upstash Redis
-                                        (via RDS Proxy,      (rate limits,
-                                         FORCE RLS)           AI token budgets)
-                                               + Plaid · Groq/Claude (egress)
+Browser ──► Vercel (Next.js 16 + BFF) ──► AWS ECS Fargate (FastAPI)
+              │                              │            │
+              │                    Aurora PostgreSQL   Upstash Redis
+              │                    (RDS Proxy, FORCE   (rate limits,
+              │                     RLS)                AI token budgets)
+              │                              + Plaid · Groq/Claude (egress)
+              └─ same-origin only; nonce CSP, httpOnly refresh cookie
 ```
 
-- **BFF security model** — the browser only talks to Next; route handlers proxy to the
-  backend server-side. Access token in memory, refresh token in a first-party httpOnly
-  cookie, strict **nonce-based CSP**. `API_BASE_URL` is server-only.
-- **Tenant + per-user isolation** — Postgres **FORCE Row-Level Security**; the app
-  connects as a non-owner `app_user` (`NOBYPASSRLS`). Admin cross-tenant reads go through
-  narrow audited `SECURITY DEFINER` functions only.
-- **Grounded AI** — every quantitative answer must call a tenant-scoped tool for live
-  data; an output validator rejects ungrounded numbers, missing compliance framing, and
-  secret/SQL leaks; an input layer blocks prompt-injection/jailbreak/crisis.
+Three properties define the design:
+
+- **BFF security model.** The browser talks only to Next.js; route handlers proxy to
+  the backend server-side. The access token stays in memory, the refresh token in a
+  first-party httpOnly cookie, and CSP is nonce-based. `API_BASE_URL` is server-only.
+- **Tenant and per-user isolation.** Postgres FORCE Row-Level Security, with the
+  application connecting as a non-owner `app_user` (`NOBYPASSRLS`). Admin cross-tenant
+  reads go through narrow, audited `SECURITY DEFINER` functions only.
+- **Grounded AI.** Every quantitative answer must call a tenant-scoped tool for live
+  data. An output validator rejects ungrounded numbers, missing compliance framing,
+  and secret or SQL leakage; an input layer blocks prompt injection, jailbreaks, and
+  crisis signals.
+
+## Tech stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 16 (App Router, RSC, BFF), React 19, TypeScript 5, Tailwind 4, TanStack Query, Radix, zod, motion, posthog-js |
+| Backend | Python 3.11, FastAPI, asyncpg (raw parameterized SQL — no ORM), Pydantic v2, JWT |
+| Data | Aurora PostgreSQL 16 (Serverless v2, FORCE RLS), Redis, durable `sync_jobs` queue |
+| AI | Groq (Llama 3.3 70B) / Anthropic Claude — grounded agentic tool-calling with a safety eval harness |
+| Integrations | Plaid (transactions, liabilities, investments), Stripe (billing) |
+| Infrastructure | ECS Fargate, Aurora, RDS Proxy, ECR, SSM, CloudWatch, Upstash Redis, Vercel, Terraform |
+| Quality | ruff, mypy, pytest · ESLint, Vitest with Testing Library, Playwright with axe |
 
 ## Repository layout
 
@@ -54,26 +67,16 @@ Browser ──► Vercel (Next.js 16 frontend + BFF)  ──►  AWS ECS Fargate
 └── docker-compose.yml    local Postgres + Redis
 ```
 
-## Tech stack
+## Quick start
 
-| Layer | Tech |
-|---|---|
-| **Frontend** | Next.js 16 (App Router, RSC, BFF), React 19, TypeScript 5, Tailwind 4 (token `@theme`), TanStack Query, Radix, zod, react-markdown, react-plaid-link, motion, posthog-js |
-| **Backend** | Python 3.12, FastAPI, asyncpg (raw parameterized SQL — no ORM), Pydantic v2, JWT |
-| **Data** | Aurora PostgreSQL 16 (Serverless v2, FORCE RLS), Redis (rate limits + AI token budgets), durable `sync_jobs` queue |
-| **AI** | Groq (Llama 3.3 70B) / Anthropic Claude — grounded agentic tool-calling + safety eval harness |
-| **Integrations** | Plaid (transactions/liabilities/investments), Stripe (billing, built) |
-| **Infra** | AWS ECS Fargate · Aurora PostgreSQL · RDS Proxy · ECR · SSM · CloudWatch · Upstash Redis · Vercel · Terraform |
-| **Quality** | ruff, mypy, pytest (backend) · ESLint, Vitest + Testing Library, Playwright + axe (frontend) |
+**1. Datastores** (from the repository root):
 
-## Quick start (local)
-
-**1) Datastores** (from repo root):
 ```bash
-docker compose up -d postgres redis        # Postgres :5433, Redis :6380
+docker compose up -d postgres redis    # Postgres :5433, Redis :6380
 ```
 
-**2) Backend** (`backend/`):
+**2. Backend** (`backend/`):
+
 ```bash
 cp .env.example .env
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
@@ -82,39 +85,58 @@ python -m scripts.migrate                            # apply db/migrations/*.sql
 uvicorn app.main:app --reload --port 3000            # http://localhost:3000/docs
 ```
 
-**3) Frontend** (`frontend/`):
+**3. Frontend** (`frontend/`):
+
 ```bash
 npm install
 echo "API_BASE_URL=http://localhost:3000" > .env.local
 npm run dev                                          # http://localhost:3100
 ```
 
-See [backend/README.md](backend/README.md) and [frontend/README.md](frontend/README.md) for details.
+See [backend/README.md](backend/README.md) and [frontend/README.md](frontend/README.md)
+for detail.
 
-## Testing & CI
+## Testing and CI
 
 ```bash
 # backend
-cd backend && ruff check . && mypy app && pytest           # + python -m scripts.run_evals
+cd backend && ruff check . && mypy app && pytest     # + python -m scripts.run_evals
 # frontend
-cd frontend && npm run lint && npm test && npm run build   # Vitest unit + build
+cd frontend && npm run lint && npm test && npm run build
 ```
 
-CI (`.github/workflows/ci.yml`) runs lint, type-check, tests, an **AI-safety eval gate**,
-a dependency scan, and the frontend job on every push/PR. Merges to `main` **auto-deploy**
-the frontend to Vercel (and the backend to ECS once AWS secrets are set).
+CI (`.github/workflows/ci.yml`) runs lint, type-check, tests, an AI-safety eval gate,
+and a dependency scan on every push and pull request. Merges to `main` deploy the
+frontend to Vercel, and the backend to ECS once AWS secrets are configured.
 
 ## Deployment
 
-Live today on **AWS (ECS Fargate + Aurora PostgreSQL + RDS Proxy + SSM) + Upstash Redis + Vercel**.
-Infrastructure is **Terraform** in [infra/terraform/](infra/terraform/).
-Deploy runbook: [DEVOPS_HANDOFF.md](DEVOPS_HANDOFF.md).
+Production runs on AWS (ECS Fargate, Aurora, RDS Proxy, SSM) with Upstash Redis and
+Vercel. Infrastructure is provisioned by Terraform in
+[infra/terraform/](infra/terraform/); the runbook is
+[DEVOPS_HANDOFF.md](DEVOPS_HANDOFF.md).
 
 ## Status
 
-- ✅ Backend Phases 0–6 — auth, Plaid, grounded AI advisor + safety, budgets/goals/debt/portfolio, proactive alerts, reliability/observability ([backend/docs/](backend/docs/))
-- ✅ Frontend — full product: marketing site, authenticated app (10 surfaces), admin console; light/dark theme; unit + e2e tests
-- ✅ Deployed to AWS + Vercel with CI/CD and IaC
-- ⏭️ Activation items: production Plaid, Stripe live keys, counsel-reviewed legal, stable HTTPS via load balancer
+- Backend phases 0–6 complete: authentication, Plaid, grounded AI advisor with its
+  safety stack, budgets, goals, debt and portfolio, proactive alerts, and
+  reliability and observability.
+- Frontend complete: marketing site, authenticated application (10 surfaces), admin
+  console, light and dark themes, unit and end-to-end tests.
+- Deployed to AWS and Vercel with CI/CD and infrastructure as code.
+- Outstanding for launch: production Plaid and Stripe keys, counsel-reviewed legal
+  pages, and stable HTTPS via the load balancer.
 
-> Educational information, not financial advice.
+## Documentation
+
+| Document | Purpose |
+|---|---|
+| [DEVOPS_HANDOFF.md](DEVOPS_HANDOFF.md) | Deploy guide — ECS, Aurora, SSM, Vercel |
+| [backend/docs/](backend/docs/) | Architecture, security, disaster recovery, production deployment |
+| [infra/terraform/README.md](infra/terraform/README.md) | Terraform apply and out-of-band database setup |
+| [EMAIL_SETUP.md](EMAIL_SETUP.md) | Email delivery — Resend, SMTP, SendGrid |
+| [DEPLOY.md](DEPLOY.md) | Legacy runbook, superseded by DEVOPS_HANDOFF.md |
+
+---
+
+Educational information; not financial advice.
