@@ -67,7 +67,6 @@ After `apply`:
    ```
 4. **Run migrations** — ECS one-off task in the **moneywealth** cluster (private subnets,
    `moneywealth-task` SG), command override: `python,-m,scripts.migrate`.
-   Helper JSON: `tmp-ecs-network.json`, `tmp-ecs-migrate-overrides.json`.
 5. **Bootstrap roles** — after migrations:
    - `ALTER ROLE app_user PASSWORD '<from app-user-db secret>';`
    - `ALTER ROLE mwadmin BYPASSRLS;`
@@ -94,7 +93,9 @@ Local state by default. For a team, uncomment the S3 backend in `versions.tf`
 
 ### `terraform apply` failed deleting old RDS (`deletion protection`)
 ```bash
-aws rds modify-db-instance --db-instance-identifier moneywealth-db \
+aws rds modify-db-cluster --db-cluster-identifier moneywealth-aurora \
+  --no-deletion-protection --apply-immediately --region us-east-1
+aws rds modify-db-instance --db-instance-identifier moneywealth-aurora-writer \
   --no-deletion-protection --apply-immediately --region us-east-1
 terraform apply
 ```

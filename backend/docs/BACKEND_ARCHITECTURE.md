@@ -5,7 +5,7 @@
 
 > Note: sections below that reference Vercel serverless functions describe the original blueprint; our implementation runs the service plane as Python containers (ECS Fargate) with FastAPI. The two-plane reasoning still applies.
 
-This document is the backend plan. Schema lives in `db/schema.sql`. Build order lives in `docs/BUILD_SEQUENCE.md`.
+This document is the backend design notes. Schema lives in `db/schema.sql`; the executable source of truth is `db/migrations/*.sql` (run via `python -m scripts.migrate`).
 
 ---
 
@@ -116,7 +116,7 @@ Model IDs to use: primary `claude-opus-4-8` (or `claude-sonnet-4-6` for cost/lat
 
 ## 7. What I'm explicitly deferring even on the "full build"
 
-You said full blueprint — agreed, but *sequenced*. These ship after the core loop is proven end-to-end (see `BUILD_SEQUENCE.md`), because building them first delays having anything testable:
+You said full blueprint — agreed, but *sequenced*. These ship after the core loop is proven end-to-end, because building them first delays having anything testable:
 
 - i18n / multi-currency / RTL (Section 29) → after US launch
 - A/B testing framework (Section 28.3) → once you have traffic to test

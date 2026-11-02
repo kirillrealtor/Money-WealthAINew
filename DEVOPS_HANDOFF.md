@@ -237,5 +237,4 @@ demo only — **prefer Path A (ALB + HTTPS) for anything real.**
 New AWS account/creds, new Upstash Redis, fresh Aurora cluster (via Terraform),
 SSM connection strings, fresh JWT secrets, Plaid + AI keys, a domain + ACM cert
 (Path A), and the GitHub repo secrets (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`,
-`VERCEL_TOKEN`). See [backend/AURORA_MIGRATION_PROGRESS.txt](backend/AURORA_MIGRATION_PROGRESS.txt)
-for the completed cutover checklist.
+`VERCEL_TOKEN`).

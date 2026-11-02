@@ -160,13 +160,6 @@ If the API returns “Check your email” but nothing arrives, sign in with the
 ### Store API key in AWS (one-time)
 
 ```powershell
-cd backend\scripts
-.\setup_resend_ssm.ps1 -ApiKey "re_YOUR_KEY"
-```
-
-Or manually:
-
-```powershell
 aws ssm put-parameter --name /moneywealth/RESEND_API_KEY --type SecureString `
   --value "re_YOUR_KEY" --overwrite --region us-east-1
 ```

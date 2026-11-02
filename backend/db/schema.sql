@@ -1,7 +1,7 @@
 -- =====================================================================
 -- NOTE: This file is the ANNOTATED REFERENCE for the full data design.
 -- The EXECUTABLE source of truth is db/migrations/*.sql (run via
--- `npm run migrate`). Keep this in sync when migrations change the schema.
+-- `python -m scripts.migrate`). Keep this in sync when migrations change the schema.
 -- =====================================================================
 --
 -- AI Financial Advisor — Consolidated Production Schema (Aurora Postgres)

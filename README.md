@@ -51,16 +51,20 @@ Three properties define the design:
 ## Repository layout
 
 ```
-backend/            Python · FastAPI · asyncpg · Redis (API and AI orchestration)
-  app/                auth, plaid, ai, budgets, goals, debt, portfolio, admin, …
-  db/migrations/      SQL schema — source of truth (FORCE RLS, SECURITY DEFINER fns)
-  tests/              unit, integration, and AI safety eval harness
-  docs/               architecture, security, DR, production deployment
-frontend/           TypeScript · Next.js 16 · React 19 · Tailwind 4
-  src/                app (BFF), components, design tokens, Vitest and Playwright
-infra/terraform/    infrastructure as code for the AWS target stack
-.github/workflows/  CI (lint, type, test, AI eval) and auto-deploy
-docker-compose.yml  local Postgres and Redis
+.
+├── backend/              Python · FastAPI · asyncpg · Redis   (API + AI orchestration)
+│   ├── app/                application code (auth, plaid, ai, budgets, goals, admin, …)
+│   ├── db/migrations/      SQL schema — source of truth (FORCE RLS, SECURITY DEFINER fns)
+│   ├── tests/ + tests/evals/  unit + integration + AI safety eval harness
+│   ├── deploy/             ECS task-definition template
+│   └── docs/               architecture, security, DR, production deployment
+├── frontend/             TypeScript · Next.js 16 · React 19 · Tailwind 4
+│   └── src/                app (BFF) · components · design tokens · Vitest/Playwright
+├── infra/terraform/      Infrastructure as Code — the scalable AWS target stack
+├── .github/workflows/    CI (lint/type/test/AI-eval) + auto-deploy (backend ECS, frontend Vercel)
+├── DEPLOY.md             legacy runbook (superseded — see DEVOPS_HANDOFF.md)
+├── DEVOPS_HANDOFF.md     authoritative deploy guide (ECS + Aurora)
+└── docker-compose.yml    local Postgres + Redis
 ```
 
 ## Quick start

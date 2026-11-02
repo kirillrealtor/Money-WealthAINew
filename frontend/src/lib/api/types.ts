@@ -121,8 +121,6 @@ export const PLAID_CATEGORIES = [
   "PERSONAL",
 ] as const;
 
-export type PlaidCategory = (typeof PLAID_CATEGORIES)[number];
-
 /** Tightest money column is NUMERIC(10,2); the backend caps inputs here. */
 export const MONEY_MAX = 99_999_999.99;
 

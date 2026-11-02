@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import base64
 import hashlib
-import hmac
 import secrets
 
 import bcrypt
@@ -55,7 +54,3 @@ def verify_password(plain: str, hashed: str) -> bool:
 # A valid bcrypt hash used to spend ~equal CPU when the account doesn't exist,
 # closing the login user-enumeration timing oracle. Computed once at import.
 DUMMY_PASSWORD_HASH: str = hash_password(secrets.token_urlsafe(16))
-
-
-def constant_time_eq(a: str, b: str) -> bool:
-    return hmac.compare_digest(a.encode("utf-8"), b.encode("utf-8"))

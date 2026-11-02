@@ -5,8 +5,7 @@ import { fileURLToPath } from "node:url";
 export default defineConfig({
   plugins: [react()],
   // Resolve the "@/" alias explicitly so it works even though test files are
-  // excluded from tsconfig (which would otherwise disable vite-tsconfig-paths
-  // for them).
+  // excluded from tsconfig.
   resolve: {
     alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
   },
