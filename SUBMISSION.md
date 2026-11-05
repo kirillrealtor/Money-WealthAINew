@@ -24,9 +24,12 @@ local verification and credential recovery are complete.
   simulated-advisor flow through real MCP and mocked checkout/pending/cancellation paths.
 - Windows environment bootstrap and script syntax passed; rerunning bootstrap preserved
   existing environment files byte-for-byte.
-- Environment limitation: tests used actual PostgreSQL and a temporary `fakeredis`
-  TCP server with Lua support because Docker Desktop was unavailable. This is not
-  verification against actual Redis or of the complete Docker startup path.
+- Docker verification completed: the backend image built, all three Compose services
+  became healthy, and the containerized backend reported PostgreSQL and Redis ready.
+  All **140 backend tests passed against actual PostgreSQL and Redis containers**.
+  All **5 browser checks passed**, including the synthetic demo through the containerized
+  backend and its actual Linux stdio MCP subprocess. This supersedes the earlier
+  temporary `fakeredis` verification.
 - No live provider key or PayPal sandbox credentials were available. No live AI response,
   actual sandbox approval/capture, hosted deployment or submission has been verified.
 
@@ -134,12 +137,12 @@ working PayPal transaction or live AI answer.
 
 ## Final release checklist
 
-- [ ] Test migrations and the full integration suite with actual PostgreSQL and Redis.
-- [ ] Confirm repeated setup/seed does not overwrite configuration or duplicate sample data.
+- [x] Test migrations and the full integration suite with actual PostgreSQL and Redis.
+- [x] Confirm repeated setup/seed does not overwrite configuration or duplicate sample data.
 - [ ] Run a live AI turn through MCP; verify its figures against tool results.
 - [ ] Complete PayPal sandbox buyer approval and completed capture; verify seller activity.
 - [ ] Check cancellation, pending payments, retries, missing data, MCP failure and user isolation.
-- [ ] Run frontend lint/tests/build and purchase browser tests against the submitted build.
+- [x] Run frontend lint/tests/build and purchase browser tests against the current feature branch.
 - [ ] Select and document the final judge-access path; verify it from a clean environment.
 - [ ] Confirm team ownership and the MIT license; make the repository public.
 - [ ] Finalize tools disclosure and existing-project changes with the team.

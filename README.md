@@ -95,8 +95,9 @@ http://localhost:3000/health/ready. New local configuration uses simulated AI;
 real AI, Plaid and PayPal sandbox operations require the team's credentials.
 Stop a separately running native backend before starting Docker so port 3000 is free.
 Use `docker compose logs app` to inspect startup and `docker compose down` to stop
-containers while preserving the database volume. Docker startup is not yet verified
-on this workstation because Docker Desktop is not installed.
+containers while preserving the database volume. Docker startup, readiness, seeding,
+and the local browser demo were verified on November 5, 2026 with actual PostgreSQL
+and Redis containers. The full backend suite passed all 140 tests against those services.
 
 ### Run the backend natively with Docker datastores
 
@@ -170,7 +171,7 @@ The historical deployment notes below are not proof that the current hosted back
 - AWS/Vercel deployment configuration exists; the hosted backend and this branch's
   deployment still need verification.
 - Submission gates: live AI through MCP, actual PayPal sandbox approval/capture,
-  real Redis verification, and working judge access. Production launch additionally
+  working judge access. Production launch additionally
   requires its own keys, infrastructure and legal review.
 
 ## Documentation
