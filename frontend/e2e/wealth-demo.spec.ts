@@ -1,16 +1,10 @@
 /** Local-stack smoke test. Uses seeded data and actual backend/MCP; no mocked API routes. */
-import { readFileSync } from "node:fs";
-import path from "node:path";
 import { expect, test } from "@playwright/test";
+import { loginDemo } from "./helpers";
 
 test("seeded purchase assessment and simulated advisor cross real MCP", async ({ page }) => {
   test.setTimeout(90_000);
-  // Read only the local test password; never print it or include it in screenshots.
-  const env = readFileSync(path.resolve(process.cwd(), "../backend/.env"), "utf8");
-  const fromFile = env.match(/^DEMO_PASSWORD=["']?([^\r\n"']+)/m)?.[1];
-  const password = process.env.E2E_DEMO_PASSWORD ?? fromFile ?? "WealthDemo123!";
-  const login = await page.request.post("/api/auth/login", { data: { email: "demo@fathom.app", password } });
-  expect(login.status(), "seeded local demo login").toBe(200);
+  await loginDemo(page);
   await page.goto("/app/purchases");
   await expect(page.getByText(/Synthetic demo finances/)).toBeVisible();
   await page.getByRole("button", { name: "Check affordability" }).click();

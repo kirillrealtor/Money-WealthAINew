@@ -17,8 +17,9 @@ test.describe("authenticated app", () => {
   test("dashboard loads with greeting and summaries", async ({ page }) => {
     await page.goto("/app");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Net worth" })).toBeVisible();
-    await expect(page.getByRole("link", { name: /Connect a bank/i }).first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Net worth", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "View linked accounts" })).toBeVisible();
+    await expect(page.getByText("$16,500.00", { exact: true }).first()).toBeVisible();
   });
 
   test("budgets render; can create and delete one", async ({ page }) => {
@@ -40,15 +41,16 @@ test.describe("authenticated app", () => {
 
   test("goals page shows the seeded goals", async ({ page }) => {
     await page.goto("/app/goals");
-    await expect(page.getByText("Emergency Fund")).toBeVisible();
+    await expect(page.getByText("Synthetic emergency fund", { exact: true })).toBeVisible();
   });
 
-  test("accounts page shows a linked bank", async ({ page }) => {
+  test("accounts page distinguishes synthetic data from a Plaid connection", async ({ page }) => {
     await page.goto("/app/accounts");
-    await expect(page.getByText("Plaid Checking").first()).toBeVisible();
+    await expect(page.getByText("Synthetic Checking", { exact: true })).toBeVisible();
+    await expect(page.getByText("Synthetic data - no Plaid connection", { exact: true })).toBeVisible();
   });
 
-  test("debt and portfolio show real data", async ({ page }) => {
+  test("debt and portfolio show seeded financial data", async ({ page }) => {
     await page.goto("/app/debt");
     await expect(page.getByText("Total debt")).toBeVisible();
     await page.goto("/app/portfolio");

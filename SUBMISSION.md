@@ -15,19 +15,27 @@ local verification and credential recovery are complete.
 
 ### Local verification recorded November 5, 2026
 
+Broader credential-free browser coverage now includes the seeded dashboard, budget
+creation/deletion, goals, accounts, debt, portfolio, settings and advisor screens,
+plus public pages and settled-page accessibility scans. Admin sign-in tests require
+an explicitly provisioned test administrator and are skipped when its credentials are
+absent; public admin-route protection is still checked. The CI workflow is configured to run this
+suite against Docker without paid provider or bank keys.
+
 - Backend: **140 tests passed**, plus ruff and mypy. All 21 migrations applied to a
   fresh PostgreSQL 16 database; repeated synthetic seeding passed its idempotency check.
 - MCP: actual stdio subprocess initialization, discovery, resource reading, tool calls,
   user/tenant isolation, cancellation, queue limits and turn deadlines were exercised.
 - Frontend: **27 unit tests passed**, lint passed, and the production build passed.
-- Browser: **5 purchase checks passed**, including a local-stack login/assessment/
-  simulated-advisor flow through real MCP and mocked checkout/pending/cancellation paths.
+- Browser: **22 checks passed**, including core finance screens, public pages,
+  accessibility scans and the purchase flow through real MCP. Two protected admin
+  sign-in checks are explicitly skipped until test-admin credentials are configured.
 - Windows environment bootstrap and script syntax passed; rerunning bootstrap preserved
   existing environment files byte-for-byte.
 - Docker verification completed: the backend image built, all three Compose services
   became healthy, and the containerized backend reported PostgreSQL and Redis ready.
   All **140 backend tests passed against actual PostgreSQL and Redis containers**.
-  All **5 browser checks passed**, including the synthetic demo through the containerized
+  All **22 browser checks passed**, including the synthetic demo through the containerized
   backend and its actual Linux stdio MCP subprocess. This supersedes the earlier
   temporary `fakeredis` verification.
 - No live provider key or PayPal sandbox credentials were available. No live AI response,

@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, 'feature/**']
   pull_request:
     branches: [main]
 
@@ -109,3 +109,52 @@ jobs:
       - run: npm run build
         env:
           NEXT_PUBLIC_APP_URL: https://moneywealth-ai.vercel.app
+
+  browser-demo:
+    name: Credential-free Docker demo + browser checks
+    runs-on: ubuntu-latest
+    needs: [tests, frontend]
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "22", cache: "npm", cache-dependency-path: frontend/package-lock.json }
+      - name: Create isolated local-demo configuration
+        run: |
+          pip install python-dotenv==1.2.2
+          python scripts/bootstrap_env.py
+      - name: Build backend and start actual PostgreSQL/Redis
+        run: |
+          docker compose up -d --build --wait
+          docker compose exec -T app python -m scripts.seed_demo
+      - name: Build frontend and install browser
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+          npx playwright install --with-deps chromium
+      - name: Start frontend and run browser suite
+        working-directory: frontend
+        run: |
+          npm start > /tmp/wealth-frontend.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://localhost:3100/login > /dev/null; then break; fi
+            sleep 2
+          done
+          curl --fail --silent http://localhost:3100/login > /dev/null
+          npx playwright test
+      - name: Save browser failure traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-failure-traces
+          path: frontend/test-results/
+          retention-days: 7
+      - name: Stop test containers
+        if: always()
+        run: docker compose down

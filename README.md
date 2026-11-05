@@ -150,7 +150,8 @@ frontend to Vercel, and the backend to ECS once AWS secrets are configured.
 
 ## Deployment
 
-The former AWS backend is no longer hosted there. First verify the local Docker
+The former AWS backend is no longer hosted there. See [RAILWAY_HANDOFF.md](RAILWAY_HANDOFF.md)
+for the prepared, undeployed Railway configuration and migration checklist. First verify the local Docker
 stack; deployment to Railway is the next phase. Existing AWS Terraform and
 [DEVOPS_HANDOFF.md](DEVOPS_HANDOFF.md) are historical references. Do not provision
 that stack as part of local setup. The team is recovering the existing API keys
@@ -177,6 +178,8 @@ The historical deployment notes below are not proof that the current hosted back
 ## Documentation
 
 PayPal hackathon checkout setup and demo: [PAYPAL_SETUP.md](PAYPAL_SETUP.md).
+For recovered credentials and the exact Docker reload/live-check sequence, see
+[KEYS_HANDOFF.md](KEYS_HANDOFF.md).
 
 | Document | Purpose |
 |---|---|

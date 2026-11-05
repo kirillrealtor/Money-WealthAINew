@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 /**
- * E2E against the live local stack (frontend :3100 + backend :8000) — both must
+ * E2E against the live local stack (frontend :3100 + backend :3000) — both must
  * be running. Auth uses ROTATING refresh tokens, so a shared session can't be
  * reused across tests (reuse → family revoke). Instead each authenticated test
  * logs in fresh via the API (see e2e/helpers.ts), getting its own token family.

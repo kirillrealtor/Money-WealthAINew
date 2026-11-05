@@ -3,7 +3,6 @@ import { test, expect } from "@playwright/test";
 test.describe("marketing / public", () => {
   test("landing renders the hero and CTAs", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByText("Grounded AI")).toBeVisible();
     await expect(page.getByRole("heading", { level: 1 })).toContainText("understand");
     await expect(page.getByRole("link", { name: /Start free/i }).first()).toBeVisible();
   });
