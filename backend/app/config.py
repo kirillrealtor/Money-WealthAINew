@@ -82,6 +82,15 @@ class Settings(BaseSettings):
     # Where Stripe Checkout / the Customer Portal send the user back (frontend).
     web_app_url: str = "http://localhost:3100"
 
+    # Hackathon checkout is deliberately sandbox-only. Never expose these to the browser.
+    paypal_client_id: str | None = None
+    paypal_client_secret: str | None = None
+    demo_password: str = Field(default="WealthDemo123!", min_length=12)
+    mcp_max_concurrent: int = Field(default=2, ge=1, le=8)
+    mcp_queue_timeout_s: float = Field(default=5, gt=0)
+    mcp_call_timeout_s: float = Field(default=15, gt=0)
+    mcp_turn_timeout_s: float = Field(default=120, gt=0)
+
     mail_transport: Literal["console", "smtp", "sendgrid", "resend"] = "console"
     mail_from: str = "no-reply@financialadvisor.local"
     smtp_host: str | None = None

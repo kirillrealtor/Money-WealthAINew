@@ -45,6 +45,7 @@ async def client() -> AsyncIterator[httpx.AsyncClient]:
     # Import here so the skip above applies before any DB wiring.
     from app import db
     from app.main import app
+    from app.redis_client import close_redis
 
     await db.init_pool()
     await _clear_rate_limits()
@@ -53,4 +54,7 @@ async def client() -> AsyncIterator[httpx.AsyncClient]:
         async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as c:
             yield c
     finally:
+        # Each pytest-asyncio test owns a new loop. Dispose pooled Redis sockets
+        # before it closes so the next test cannot silently fail open on a stale loop.
+        await close_redis()
         await db.close_pool()

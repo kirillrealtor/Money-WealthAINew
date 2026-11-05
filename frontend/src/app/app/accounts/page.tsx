@@ -75,7 +75,7 @@ function ItemCard({ item }: { item: PlaidItem }) {
             <p className="font-medium">{item.institution_name ?? "Linked bank"}</p>
             <p className="mt-0.5 flex items-center gap-1.5 text-xs text-fg-subtle">
               {ok ? <Dot tone="positive" /> : <CircleAlert className="size-3.5 text-warning" />}
-              {ok ? "Connected" : "Needs attention"}
+              {item.item_status === "synthetic" ? "Synthetic data - no Plaid connection" : ok ? "Connected" : "Needs attention"}
               {item.last_sync_at && <span>· synced {new Date(item.last_sync_at).toLocaleDateString()}</span>}
             </p>
           </div>

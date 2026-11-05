@@ -6,12 +6,19 @@ An AI-native personal finance platform. Users connect real bank accounts — rea
 via Plaid — and receive grounded guidance on budgets, goals, debt payoff, and
 portfolio health, alongside an AI advisor that cites the data behind every figure.
 
-**Live:** https://moneywealth-ai.vercel.app
+**Previous deployment (not verified for this branch):** https://moneywealth-ai.vercel.app
 
 A monorepo holding a Python/FastAPI backend and a Next.js/TypeScript frontend,
 coordinated through the backend's generated OpenAPI contract.
 
 ## Architecture
+
+Current workflow: local Next.js frontend -> local Docker/FastAPI backend ->
+PostgreSQL + Redis, with private stdio MCP financial tools. The former AWS
+deployment has been retired. Railway is the next hosting target, after local
+verification and recovery of the team's integration credentials.
+
+The diagram below describes the historical AWS deployment, not an active service.
 
 ```
 Browser ──► Vercel (Next.js 16 + BFF) ──► AWS ECS Fargate (FastAPI)
@@ -69,6 +76,37 @@ Three properties define the design:
 
 ## Quick start
 
+### Run the backend in Docker
+
+Install and start Docker Desktop with Linux containers, then from the repository root:
+
+```powershell
+# Create local configuration and install development dependencies; preserve existing .env values.
+powershell -ExecutionPolicy Bypass -File setup.ps1 -SkipServices
+docker compose up -d --build --wait
+# After all services are healthy, populate the dedicated synthetic demo profile.
+docker compose exec app python -m scripts.seed_demo
+powershell -ExecutionPolicy Bypass -File start-dev.ps1 frontend
+```
+
+Open http://localhost:3100. Sign in as `demo@fathom.app` using `DEMO_PASSWORD`
+from `backend/.env`. The backend is at http://localhost:3000 and readiness is
+http://localhost:3000/health/ready. New local configuration uses simulated AI;
+real AI, Plaid and PayPal sandbox operations require the team's credentials.
+Stop a separately running native backend before starting Docker so port 3000 is free.
+Use `docker compose logs app` to inspect startup and `docker compose down` to stop
+containers while preserving the database volume. Docker startup is not yet verified
+on this workstation because Docker Desktop is not installed.
+
+### Run the backend natively with Docker datastores
+
+For the current hackathon branch on Windows, run
+`powershell -ExecutionPolicy Bypass -File setup.ps1`, then start the two services with
+`start-dev.ps1 backend` and `start-dev.ps1 frontend` in separate terminals.
+See [SUBMISSION.md](SUBMISSION.md) for judge instructions, external credentials,
+synthetic-data disclosure, and the remaining live verification gates.
+The advisor now uses [actual private stdio MCP](backend/docs/MCP.md).
+
 **1. Datastores** (from the repository root):
 
 ```bash
@@ -111,23 +149,33 @@ frontend to Vercel, and the backend to ECS once AWS secrets are configured.
 
 ## Deployment
 
-Production runs on AWS (ECS Fargate, Aurora, RDS Proxy, SSM) with Upstash Redis and
-Vercel. Infrastructure is provisioned by Terraform in
-[infra/terraform/](infra/terraform/); the runbook is
-[DEVOPS_HANDOFF.md](DEVOPS_HANDOFF.md).
+The former AWS backend is no longer hosted there. First verify the local Docker
+stack; deployment to Railway is the next phase. Existing AWS Terraform and
+[DEVOPS_HANDOFF.md](DEVOPS_HANDOFF.md) are historical references. Do not provision
+that stack as part of local setup. The team is recovering the existing API keys
+and environment configuration; avoid replacing their integration credentials.
 
 ## Status
+
+Hackathon branch additions: actual MCP server/client, synthetic development seed,
+Windows setup scripts, and PayPal sandbox purchase planning/checkout. Live provider
+and PayPal sandbox verification are still required before claiming submission readiness.
+The historical deployment notes below are not proof that the current hosted backend is reachable.
 
 - Backend phases 0–6 complete: authentication, Plaid, grounded AI advisor with its
   safety stack, budgets, goals, debt and portfolio, proactive alerts, and
   reliability and observability.
 - Frontend complete: marketing site, authenticated application (10 surfaces), admin
   console, light and dark themes, unit and end-to-end tests.
-- Deployed to AWS and Vercel with CI/CD and infrastructure as code.
-- Outstanding for launch: production Plaid and Stripe keys, counsel-reviewed legal
-  pages, and stable HTTPS via the load balancer.
+- AWS/Vercel deployment configuration exists; the hosted backend and this branch's
+  deployment still need verification.
+- Submission gates: live AI through MCP, actual PayPal sandbox approval/capture,
+  real Redis verification, and working judge access. Production launch additionally
+  requires its own keys, infrastructure and legal review.
 
 ## Documentation
+
+PayPal hackathon checkout setup and demo: [PAYPAL_SETUP.md](PAYPAL_SETUP.md).
 
 | Document | Purpose |
 |---|---|

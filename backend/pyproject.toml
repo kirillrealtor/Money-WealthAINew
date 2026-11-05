@@ -2,7 +2,7 @@
 name = "financial-advisor-backend"
 version = "0.1.0"
 description = "AI Financial Advisor backend (FastAPI)"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 
 [tool.ruff]
 line-length = 120
@@ -13,7 +13,7 @@ select = ["E", "F", "I", "UP", "B", "ASYNC"]
 ignore = ["B008"]  # FastAPI uses function calls in argument defaults (Depends)
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 strict = true
 ignore_missing_imports = true
 disallow_untyped_decorators = false

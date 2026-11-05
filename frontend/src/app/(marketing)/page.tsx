@@ -180,18 +180,18 @@ function AdvisorShowcase() {
             <span className="font-display font-normal italic text-aurora">tied to your data.</span>
           </h3>
           <p className="text-fg-muted">
-            Every figure is traceable. The advisor calls your real accounts,
-            cites what it used, and tells you honestly when it doesn&apos;t know —
-            no hallucinated balances, no generic platitudes.
+            The advisor reads financial tools through MCP and shows which tools
+            supported its answer. Review the figures against your financial data;
+            AI explanations can still make mistakes.
           </p>
           <div className="flex flex-wrap gap-2">
             <Badge>Grounded</Badge>
-            <Badge>Cites its sources</Badge>
-            <Badge>Streams in real time</Badge>
+            <Badge>Shows financial tools</Badge>
+            <Badge>Private MCP connection</Badge>
           </div>
         </div>
 
-        {/* Right: live streaming conversation */}
+        {/* Scripted illustration below; the actual advisor uses the authenticated MCP flow. */}
         <div className="relative border-t border-line bg-ink/40 p-6 sm:p-8 md:border-l md:border-t-0">
           <AdvisorDemo />
         </div>

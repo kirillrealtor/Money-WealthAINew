@@ -51,8 +51,8 @@ export function Sidebar() {
       </nav>
 
       <div className="rounded-[14px] border border-line bg-surface/40 p-3 text-xs text-fg-subtle">
-        <span className="font-medium text-fg">Grounded AI</span> — every figure is cited and
-        traceable.
+        <span className="font-medium text-fg">Financial tools via MCP</span> — review the data
+        behind your decisions.
       </div>
     </aside>
   );

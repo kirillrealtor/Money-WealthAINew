@@ -22,6 +22,7 @@ from app.modules.debt.router import router as debt_router
 from app.modules.goals.router import router as goals_router
 from app.modules.health.router import router as health_router
 from app.modules.notifications.router import router as notifications_router
+from app.modules.paypal.router import router as paypal_router
 from app.modules.plaid.router import router as plaid_router
 from app.modules.plaid.router import webhook_router as plaid_webhook_router
 from app.modules.portfolio.router import router as portfolio_router
@@ -87,6 +88,7 @@ def create_app() -> FastAPI:
     app.include_router(goals_router)
     app.include_router(debt_router)
     app.include_router(portfolio_router)
+    app.include_router(paypal_router)
     app.include_router(transactions_router)
     app.include_router(notifications_router)
     app.include_router(admin_router)

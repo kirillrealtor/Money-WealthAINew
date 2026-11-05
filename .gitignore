@@ -15,6 +15,8 @@ venv/
 # Node / frontend (future)
 node_modules/
 .next/
+frontend/test-results/
+frontend/playwright-report/
 dist/
 
 # Env & secrets

@@ -248,6 +248,7 @@ function AssistantBubble({ msg }: { msg: Extract<Msg, { role: "assistant" }> }) 
           <ChatMarkdown>{msg.content}</ChatMarkdown>
         </div>
         <Feedback messageId={msg.messageId} />
+        {msg.tools.length > 0 && <p className="mt-2 text-xs text-fg-subtle">Financial tools via MCP: {msg.tools.join(", ")}</p>}
       </div>
     </div>
   );

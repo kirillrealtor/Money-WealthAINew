@@ -14,6 +14,7 @@ class FinancialSnapshot:
     monthly_spend: float
     savings_rate: float | None
     has_linked_accounts: bool
+    is_demo_data: bool = False
 
 
 async def get_financial_snapshot(user_id: str, tenant_id: str) -> FinancialSnapshot:
@@ -24,6 +25,9 @@ async def get_financial_snapshot(user_id: str, tenant_id: str) -> FinancialSnaps
     income = round(sum(m["income"] for m in months) / len(months), 2) if months else 0.0
     spend = round(sum(m["expense"] for m in months) / len(months), 2) if months else 0.0
     savings_rate = round((income - spend) / income * 100, 1) if income > 0 else None
+    from app import db
+    async with db.with_tenant(tenant_id, user_id) as conn:
+        is_demo = bool(await conn.fetchval("SELECT is_demo FROM users WHERE user_id=$1", user_id))
 
     return FinancialSnapshot(
         net_worth=balances["net_worth"],
@@ -32,4 +36,5 @@ async def get_financial_snapshot(user_id: str, tenant_id: str) -> FinancialSnaps
         monthly_spend=spend,
         savings_rate=savings_rate,
         has_linked_accounts=bool(balances["accounts"]),
+        is_demo_data=is_demo,
     )

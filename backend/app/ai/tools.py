@@ -17,7 +17,7 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from app import db
 from app.calculations.affordability import calculate_affordability as _affordability
@@ -86,16 +86,21 @@ TOOL_DEFINITIONS: list[dict[str, Any]] = [
 # ---------------------------------------------------------------------------
 # Validated input models (reject anything the LLM hallucinates outside schema)
 # ---------------------------------------------------------------------------
-class BalancesInput(BaseModel):
-    account_types: list[str] = Field(default_factory=list)
+class ToolInput(BaseModel):
+    # The protocol validates JSON schema too; this protects direct reuse of these executors.
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
 
 
-class SpendingInput(BaseModel):
+class BalancesInput(ToolInput):
+    account_types: list[Literal["depository", "investment", "credit", "loan"]] = Field(default_factory=list)
+
+
+class SpendingInput(ToolInput):
     period: Literal["this_month", "last_month", "last_30d", "last_90d"]
 
 
-class CashFlowInput(BaseModel):
-    months: int = 3
+class CashFlowInput(ToolInput):
+    months: int = Field(default=3, ge=1, le=12)
 
 
 _PERIOD_DAYS = {"last_30d": 30, "last_90d": 90}
@@ -225,14 +230,14 @@ TOOL_DEFINITIONS += [
 ]
 
 
-class AffordabilityInput(BaseModel):
-    purchase_amount: float
+class AffordabilityInput(ToolInput):
+    purchase_amount: float = Field(gt=0, le=99999999.99)
     is_recurring: bool
-    monthly_payment_estimate: float = 0
+    monthly_payment_estimate: float = Field(default=0, ge=0, le=99999999.99)
 
 
-class DebtPayoffInput(BaseModel):
-    extra_monthly_payment: float = 0
+class DebtPayoffInput(ToolInput):
+    extra_monthly_payment: float = Field(default=0, ge=0, le=99999999.99)
 
 
 async def _fetch_debts(conn: Any, user_id: str) -> list[Any]:
@@ -299,6 +304,10 @@ async def exec_calculate_affordability(user_id: str, tenant_id: str, raw: dict[s
     balances = await exec_get_account_balances(user_id, tenant_id, {"account_types": ["depository"]})
     cash = await exec_get_cash_flow(user_id, tenant_id, {"months": 3})
     months = cash["months"]
+    # Do not describe absent or mixed-currency data as proof that a purchase is affordable.
+    if (not balances["accounts"] or not months or
+            any(a["currency"] != "USD" or a["balance"] is None for a in balances["accounts"])):
+        return {"recommendation_flag": "insufficient_data", "note": "Linked USD accounts and spending are required."}
     income = sum(m["income"] for m in months) / len(months) if months else 0.0
     spend = sum(m["expense"] for m in months) / len(months) if months else 0.0
     liquid = sum((a["balance"] or 0) for a in balances["accounts"])

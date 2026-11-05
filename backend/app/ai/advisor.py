@@ -2,11 +2,8 @@
 validation -> persistence -> usage accounting."""
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
 from typing import Any
-
-from pydantic import ValidationError
 
 from app import db
 from app.audit import audit
@@ -15,11 +12,10 @@ from app.logging_conf import logger
 
 from .budget import record_usage
 from .health import record_validation_failure
+from .mcp_client import financial_mcp
 from .prompts import PROMPT_VERSION, build_system_prompt
 from .provider import AdvisorProvider, get_provider
 from .safety import CRISIS_RESPONSE, detect_crisis, detect_jailbreak, sanitize_input
-from .snapshot import get_financial_snapshot
-from .tools import EXECUTORS, TOOL_DEFINITIONS
 from .validator import CORRECTION_INSTRUCTION, validate_output
 
 _REFUSAL = (
@@ -79,44 +75,38 @@ async def run_turn(
     # 4. Grounded agentic loop. Usage is recorded after a successful turn.
     # 5. Build context: history + live snapshot + persona/compliance system prompt.
     history = await _load_history(chat_id, tenant_id)
-    snapshot = await get_financial_snapshot(user_id, tenant_id)
-    system = build_system_prompt(first_name=first_name, persona=persona, snapshot=snapshot)
-    messages: list[dict[str, Any]] = [*history, {"role": "user", "content": message}]
+    # One private MCP subprocess per turn binds identity once, before any model-generated tool inputs exist.
+    async with financial_mcp(user_id, tenant_id) as mcp:
+        snapshot = await mcp.snapshot()
+        system = build_system_prompt(first_name=first_name, persona=persona, snapshot=snapshot)
+        if snapshot.is_demo_data:
+            system += ("\nThis profile uses synthetic demonstration finances, "
+                       "not a real Plaid connection. Say so clearly.")
+        messages: list[dict[str, Any]] = [*history, {"role": "user", "content": message}]
 
-    prov = provider or get_provider()
+        prov = provider or get_provider()
 
-    async def execute_tool(name: str, raw: dict[str, Any]) -> tuple[str, bool]:
-        executor = EXECUTORS.get(name)
-        if executor is None:
-            return json.dumps({"error": "unknown tool"}), True
-        try:
-            tool_out = await executor(user_id, tenant_id, raw)
-            return json.dumps(tool_out, default=str), False
-        except ValidationError:
-            return json.dumps({"error": "invalid tool input"}), True
-        except Exception as err:  # noqa: BLE001 - surface as tool error, not a crash
-            logger.error("tool execution failed", service="ai-advisor", tool=name, error_message=str(err))
-            return json.dumps({"error": "tool failed"}), True
+        # 6. Run the grounded agentic loop.
+        result = await prov.run(system=system, messages=messages, tools=mcp.tools, execute_tool=mcp.execute)
+        # Grounding evidence comes from completed MCP calls, not the provider's claims about attempted calls.
+        result.tool_calls_made = list(mcp.successful_calls)
 
-    # 6. Run the grounded agentic loop.
-    result = await prov.run(system=system, messages=messages, tools=TOOL_DEFINITIONS, execute_tool=execute_tool)
-
-    # 7. Validate; retry once with a correction, else safe fallback.
-    final_text = result.text
-    val = validate_output(final_text, tool_calls_made=result.tool_calls_made)
-    if not val.valid:
-        logger.warning("advisor output rejected", service="ai-advisor", reason=val.reason)
-        await record_validation_failure()
-        await audit("ai.output_rejected", user_id=user_id, tenant_id=tenant_id, metadata={"reason": val.reason})
-        retry_msgs = [*messages, {"role": "user", "content": CORRECTION_INSTRUCTION.format(reason=val.reason)}]
-        retry = await prov.run(
-            system=system, messages=retry_msgs, tools=TOOL_DEFINITIONS, execute_tool=execute_tool
-        )
-        result.input_tokens += retry.input_tokens
-        result.output_tokens += retry.output_tokens
-        result.tool_calls_made += retry.tool_calls_made
-        retry_ok = validate_output(retry.text, tool_calls_made=result.tool_calls_made).valid
-        final_text = retry.text if retry_ok else _FALLBACK
+        # 7. Validate; retry once with a correction, else safe fallback.
+        final_text = result.text
+        val = validate_output(final_text, tool_calls_made=result.tool_calls_made)
+        if not val.valid:
+            logger.warning("advisor output rejected", service="ai-advisor", reason=val.reason)
+            await record_validation_failure()
+            await audit("ai.output_rejected", user_id=user_id, tenant_id=tenant_id, metadata={"reason": val.reason})
+            retry_msgs = [*messages, {"role": "user", "content": CORRECTION_INSTRUCTION.format(reason=val.reason)}]
+            retry = await prov.run(
+                system=system, messages=retry_msgs, tools=mcp.tools, execute_tool=mcp.execute
+            )
+            result.input_tokens += retry.input_tokens
+            result.output_tokens += retry.output_tokens
+            result.tool_calls_made = list(mcp.successful_calls)
+            retry_ok = validate_output(retry.text, tool_calls_made=result.tool_calls_made).valid
+            final_text = retry.text if retry_ok else _FALLBACK
 
     # 8. Persist the turn and record usage.
     mid = await _persist(chat_id, tenant_id, message, final_text, provider=result.provider,

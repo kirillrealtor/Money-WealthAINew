@@ -4,6 +4,7 @@ For development environment use without external API keys.
 from __future__ import annotations
 
 import json
+import re
 from typing import Any
 
 from .provider import AdvisorResult, ToolExecutor
@@ -43,7 +44,12 @@ class MockProvider:
         tool_input: dict[str, Any] = {}
 
         # Heuristics to select the appropriate tool
-        if any(w in user_msg_lower for w in ["spend", "spent", "category", "going", "transaction"]):
+        if "afford" in user_msg_lower:
+            # This is a scripted demo, but its real tool call must still use the requested purchase amount.
+            price = re.search(r"(?:USD\s*|\$)(\d+(?:\.\d{1,2})?)", str(user_msg), re.I)
+            tool_name = "calculate_affordability"
+            tool_input = {"purchase_amount": float(price.group(1)) if price else 100.0, "is_recurring": False}
+        elif any(w in user_msg_lower for w in ["spend", "spent", "category", "going", "transaction"]):
             tool_name = "get_spending_summary"
             tool_input = {"period": "last_30d"}
         elif any(
@@ -70,9 +76,6 @@ class MockProvider:
         elif any(w in user_msg_lower for w in ["portfolio", "holding", "invest", "stock", "gain", "loss"]):
             tool_name = "get_portfolio_summary"
             tool_input = {}
-        elif "afford" in user_msg_lower:
-            tool_name = "calculate_affordability"
-            tool_input = {"purchase_amount": 100.0, "is_recurring": False}
         elif "payoff" in user_msg_lower:
             tool_name = "calculate_debt_payoff"
             tool_input = {"extra_monthly_payment": 0.0}
@@ -234,7 +237,7 @@ class MockProvider:
             lines.append("\nNext action: Ask a specific question about your budget, debts, cash flow, or net worth.")
 
         return AdvisorResult(
-            text="\n".join(lines),
+            text="Simulated advisor response for development; no live AI model was called.\n\n" + "\n".join(lines),
             provider=self.name,
             model="local-mock",
             tool_calls_made=[tool_name],

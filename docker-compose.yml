@@ -44,6 +44,14 @@ services:
     ports:
       - "3000:3000"
     command: sh -c "python -m scripts.migrate && uvicorn app.main:app --host 0.0.0.0 --port 3000"
+    # --wait must mean the migrations and real datastore connections are ready,
+    # not merely that the API container's process has been created.
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:3000/health/ready"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
 
 volumes:
   pgdata:

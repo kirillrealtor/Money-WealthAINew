@@ -1,0 +1,12 @@
+# Secrets are supplied at runtime by Compose/the hosting service, never built into an image.
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.log

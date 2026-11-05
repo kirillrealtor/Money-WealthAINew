@@ -9,6 +9,7 @@ import {
   Bell,
   Settings,
   Receipt,
+  ShoppingBag,
   type LucideIcon,
 } from "lucide-react";
 
@@ -24,6 +25,7 @@ export const NAV: NavItem[] = [
   { href: "/app/debt", label: "Debt", icon: TrendingDown, enabled: true },
   { href: "/app/portfolio", label: "Portfolio", icon: PieChart, enabled: true },
   { href: "/app/advisor", label: "Advisor", icon: Sparkles, enabled: true },
+  { href: "/app/purchases", label: "Purchase planner", icon: ShoppingBag, enabled: true },
   { href: "/app/notifications", label: "Alerts", icon: Bell, enabled: true },
   { href: "/app/settings", label: "Settings", icon: Settings, enabled: true },
 ];

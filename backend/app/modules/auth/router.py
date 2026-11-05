@@ -164,7 +164,7 @@ async def logout(request: Request, response: Response) -> MessageResponse:
 async def me(user: CurrentUser = Depends(require_auth)) -> MeResponse:
     async with db.with_tenant(user.tenant_id, user.user_id) as conn:
         row = await conn.fetchrow(
-            """SELECT user_id, email, full_name, tier, advisor_persona, is_verified, onboarding_step
+            """SELECT user_id, email, full_name, tier, advisor_persona, is_verified, onboarding_step, is_demo
                  FROM users WHERE user_id = $1""",
             user.user_id,
         )
@@ -178,6 +178,7 @@ async def me(user: CurrentUser = Depends(require_auth)) -> MeResponse:
         advisor_persona=row["advisor_persona"],
         is_verified=row["is_verified"],
         onboarding_step=row["onboarding_step"],
+        is_demo=row["is_demo"],
     )
 
 

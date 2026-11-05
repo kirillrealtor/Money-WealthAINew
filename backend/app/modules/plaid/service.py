@@ -155,6 +155,8 @@ async def disconnect_item(user_id: str, tenant_id: str, item_id: str, ip: str | 
             raise ApiError("NOT_FOUND")
 
     # Best-effort revoke at Plaid, then delete locally (cascade) regardless.
+    if row["environment"] == "synthetic":
+        raise ApiError("CONFLICT", message="Synthetic demo accounts are managed by the development seed command.")
     try:
         access_token = decrypt(bytes(row["access_token_enc"]), aad=user_id)
         await get_plaid(row["environment"]).item_remove(access_token)

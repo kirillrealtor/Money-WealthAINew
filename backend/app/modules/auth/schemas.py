@@ -76,6 +76,7 @@ class AuthConfigResponse(BaseModel):
 
 
 class MeResponse(BaseModel):
+    is_demo: bool = False
     user_id: str
     email: EmailStr
     full_name: str | None

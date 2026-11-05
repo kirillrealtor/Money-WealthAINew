@@ -13,6 +13,9 @@ from fastapi.responses import JSONResponse
 from app.context import get_trace_id
 
 API_ERRORS: dict[str, dict[str, Any]] = {
+    "MCP_UNAVAILABLE": {"status": 503, "message": "Financial tools are temporarily unavailable. Please retry."},
+    "PAYPAL_UNAVAILABLE": {"status": 503, "message": "PayPal sandbox is not configured."},
+    "PAYPAL_ERROR": {"status": 502, "message": "PayPal could not confirm this request. Retry shortly."},
     "UNAUTHORIZED": {"status": 401, "message": "Invalid or expired authentication token."},
     "FORBIDDEN": {"status": 403, "message": "You do not have permission to access this resource."},
     "CAPTCHA_REQUIRED": {"status": 403, "message": "Captcha verification is required or failed."},

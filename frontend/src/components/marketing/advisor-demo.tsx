@@ -18,9 +18,8 @@ function usePrefersReducedMotion() {
 }
 
 /**
- * Live advisor demo — a looping, self-playing conversation that *streams* the
- * answer like the real product: thinking dots → tool chip → typewritten reply
- * with grounded figures. This is the "this is an AI product" hook on the page.
+ * Scripted marketing illustration, not a live model call or streaming backend.
+ * Thinking dots and typewritten replies animate fixed synthetic examples.
  * Respects prefers-reduced-motion (shows the final state, no animation).
  */
 type Turn = {
@@ -119,6 +118,7 @@ export function AdvisorDemo() {
 
   return (
     <div className="relative">
+      <p className="mb-4 text-xs text-fg-subtle">Illustrative conversation with synthetic figures.</p>
       <div className="space-y-4">
         {/* user */}
         <div className="flex justify-end">

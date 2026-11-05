@@ -36,13 +36,13 @@ def _normalize_dsn(url: str) -> str:
     return url
 
 
-async def init_pool() -> None:
+async def init_pool(*, min_size: int = 2, max_size: int = 10) -> None:
     global _pool
     if _pool is None:
         _pool = await asyncpg.create_pool(
             dsn=_normalize_dsn(settings.database_url),
-            min_size=2,
-            max_size=10,  # per-instance; RDS Proxy fans these out safely
+            min_size=min_size,
+            max_size=max_size,  # MCP children use a smaller, bounded pool.
             command_timeout=10,
         )
         logger.info("db pool initialized", service="database")
