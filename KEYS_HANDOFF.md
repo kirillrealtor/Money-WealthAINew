@@ -16,8 +16,10 @@ Preserve existing database URLs and encryption keys when they belong to existing
   configured default and has not been verified as available to this account.
 - `ADVISOR_PROVIDER` remains explicitly `mock` until a live provider is validated.
   Adding a key does not automatically switch a provider selected as `mock`.
-- PayPal sandbox client ID and secret are not configured. No sandbox order has been
-  created or captured against PayPal's API in this credential check.
+- PayPal sandbox credentials are configured and OAuth authentication passed.
+  The user completed buyer approval and capture for USD 10.00. A subsequent
+  read-only Orders API check independently confirmed both order and capture as
+  `COMPLETED` with the expected USD 10.00 amount. No real money moved.
 - After enabling the live sync worker, use `test-backend.ps1` for backend tests.
   Its dedicated local test database and Redis namespace keep test jobs isolated
   from the app worker. All **143 backend tests passed** using that isolation.
