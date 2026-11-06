@@ -137,6 +137,11 @@ for detail.
 
 ## Testing and CI
 
+On Windows, use `powershell -ExecutionPolicy Bypass -File test-backend.ps1`
+for backend integration tests. It creates/reuses `financial_advisor_test` and Redis
+database 1 without modifying `.env` or stopping the running app. This isolation is
+required when the demo's Plaid sync worker is enabled; otherwise it can consume test jobs.
+
 ```bash
 # backend
 cd backend && ruff check . && mypy app && pytest     # + python -m scripts.run_evals

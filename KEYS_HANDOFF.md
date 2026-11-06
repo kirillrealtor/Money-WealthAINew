@@ -4,6 +4,26 @@ Use the team's private handoff channel and local/hosting environment settings.
 Never put actual values into `.env.example`, Git, screenshots, test fixtures or Devpost.
 Preserve existing database URLs and encryption keys when they belong to existing data.
 
+## Local credential checks recorded November 6, 2026
+
+- Backend configuration validated, the container was recreated, and PostgreSQL/Redis readiness passed.
+- Plaid sandbox Link token creation returned HTTP 200 with a sandbox token. This
+  verifies the initial credential/API path, not completed bank linking or transaction sync.
+  Pushkar can own the full Plaid sandbox integration checks.
+- The xAI model-list endpoint returned HTTP 403; the response referred to credits
+  and team permissions. The account owner must check billing/credit balance, API-key
+  permissions, and an available current model ID. `grok-beta` is still the local
+  configured default and has not been verified as available to this account.
+- `ADVISOR_PROVIDER` remains explicitly `mock` until a live provider is validated.
+  Adding a key does not automatically switch a provider selected as `mock`.
+- PayPal sandbox client ID and secret are not configured. No sandbox order has been
+  created or captured against PayPal's API in this credential check.
+- After enabling the live sync worker, use `test-backend.ps1` for backend tests.
+  Its dedicated local test database and Redis namespace keep test jobs isolated
+  from the app worker. All **143 backend tests passed** using that isolation.
+
+No key values, Link tokens or account identifiers are included in these notes.
+
 ## Minimum configuration for live verification
 
 | Capability | Backend settings | Notes |

@@ -41,6 +41,16 @@ suite against Docker without paid provider or bank keys.
 - No live provider key or PayPal sandbox credentials were available. No live AI response,
   actual sandbox approval/capture, hosted deployment or submission has been verified.
 
+### Credential verification recorded November 6, 2026
+
+Credential-check update, November 6: Plaid sandbox Link-token creation passed
+against the actual API. This does not yet verify bank linking/sync. xAI model
+discovery returned HTTP 403 with credit/team-permission references, so the advisor
+remains explicitly simulated; PayPal sandbox credentials are still absent. The
+backend now maps provider access/transport errors to a sanitized unavailable response.
+All **143 backend tests passed** against an isolated local test database and Redis
+namespace while the application sync worker remained enabled. See `KEYS_HANDOFF.md`.
+
 ## Devpost description draft
 
 **Inspiration.** A checkout tells you whether a payment can go through. It rarely tells
