@@ -46,7 +46,11 @@ suite against Docker without paid provider or bank keys.
 Credential-check update, November 6: Plaid sandbox Link-token creation passed
 against the actual API. This does not yet verify bank linking/sync. xAI model
 discovery returned HTTP 403 with credit/team-permission references, so the advisor
-remains explicitly simulated. PayPal sandbox credentials were subsequently added:
+initially remained simulated. A personal Gemini key was subsequently configured
+with `gemini-3.1-flash-lite`: a live advisor turn returned HTTP 200 and provider
+`gemini`, called account-balance and affordability tools through MCP, and returned
+the synthetic dataset's USD 16,500 net worth with an explanation of a USD 10 purchase.
+PayPal sandbox credentials were subsequently added:
 OAuth authentication passed, the user approved and captured USD 10.00, and a
 read-only PayPal Orders API check confirmed the order and capture as `COMPLETED`
 for USD 10.00. Seller dashboard activity remains to be reviewed. The

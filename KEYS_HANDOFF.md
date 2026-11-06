@@ -14,8 +14,13 @@ Preserve existing database URLs and encryption keys when they belong to existing
   and team permissions. The account owner must check billing/credit balance, API-key
   permissions, and an available current model ID. `grok-beta` is still the local
   configured default and has not been verified as available to this account.
-- `ADVISOR_PROVIDER` remains explicitly `mock` until a live provider is validated.
-  Adding a key does not automatically switch a provider selected as `mock`.
+- A personal Google AI Studio key was subsequently configured with
+  `ADVISOR_PROVIDER=gemini` and `GEMINI_MODEL=gemini-3.1-flash-lite`.
+  A live authenticated advisor turn returned HTTP 200, provider `gemini`, and MCP
+  calls to `get_account_balances` and `calculate_affordability`. The response
+  matched the synthetic dataset's USD 16,500 net worth and assessed a USD 10 purchase.
+  Google's older 2.5 Flash rejected new users; recommended 3.8 Flash returned
+  high-demand 503. The tested lightweight model completed successfully.
 - PayPal sandbox credentials are configured and OAuth authentication passed.
   The user completed buyer approval and capture for USD 10.00. A subsequent
   read-only Orders API check independently confirmed both order and capture as

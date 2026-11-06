@@ -6,7 +6,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from openai import AsyncOpenAI
+from openai import APIError, AsyncOpenAI
 
 from app.config import settings
 from app.errors import ApiError
@@ -23,7 +23,10 @@ class GeminiProvider:
     def __init__(self) -> None:
         if not settings.gemini_configured:
             raise ApiError("AI_UNAVAILABLE")
-        self._client = AsyncOpenAI(api_key=settings.gemini_api_key, base_url=_GEMINI_BASE_URL)
+        # Keep upstream outages inside the MCP turn deadline. The UI can offer a
+        # retry instead of hiding multiple long SDK retries behind one request.
+        self._client = AsyncOpenAI(api_key=settings.gemini_api_key, base_url=_GEMINI_BASE_URL,
+                                   timeout=30, max_retries=0)
         self._model = settings.gemini_model
 
     async def run(
@@ -44,10 +47,18 @@ class GeminiProvider:
         in_tok = out_tok = 0
 
         for _round in range(settings.advisor_max_tool_rounds + 1):
-            resp = await self._client.chat.completions.create(
-                model=self._model, messages=convo, tools=oai_tools,  # type: ignore[arg-type]
-                max_tokens=settings.advisor_max_tokens,
-            )
+            try:
+                resp = await self._client.chat.completions.create(
+                    model=self._model, messages=convo, tools=oai_tools,  # type: ignore[arg-type]
+                    max_tokens=settings.advisor_max_tokens,
+                )
+            except APIError as error:
+                # Model retirement, quota denials and network failures should produce
+                # a clear unavailable response. Never log SDK bodies: they can echo
+                # request contents or credentials into the shared provider logs.
+                logger.warning("gemini provider unavailable", service="ai-advisor",
+                               status_code=getattr(error, "status_code", None))
+                raise ApiError("AI_UNAVAILABLE") from None
             if resp.usage:
                 in_tok += resp.usage.prompt_tokens
                 out_tok += resp.usage.completion_tokens
