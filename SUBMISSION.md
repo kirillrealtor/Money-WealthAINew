@@ -115,6 +115,14 @@ team actually used before finalizing this disclosure.
 
 ## Judge setup and testing instructions
 
+For the judge-facing build, configure `NEXT_PUBLIC_DEMO_EMAIL=demo@fathom.app`
+and `NEXT_PUBLIC_DEMO_PASSWORD` in the frontend environment to match the seeded
+backend account's `DEMO_PASSWORD`, then rebuild the frontend. Both sign-in and
+sign-up display these intentionally public test credentials. Use only synthetic
+data in this shared account; never use a personal password or provider API key.
+Without both settings, the public demo card stays hidden. This does not bypass
+normal authentication or provision the account: run the demo seed first.
+
 Prerequisites: Windows PowerShell, Git, Node.js 22+, uv, and running Docker Desktop
 with Linux containers. Python 3.11 is provisioned by uv. Equivalent Python/npm/Compose
 commands from the README can be used on other platforms.

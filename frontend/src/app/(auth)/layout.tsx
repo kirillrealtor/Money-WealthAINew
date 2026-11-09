@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { JudgeDemo } from "@/components/auth/judge-demo";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -22,7 +23,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </header>
 
       <main id="main-content" className="flex flex-1 items-center justify-center px-5 py-8">
-        <div className="w-full max-w-md animate-[rise_0.5s_ease-out_both]">{children}</div>
+        <div className="w-full max-w-md animate-[rise_0.5s_ease-out_both]">
+          <JudgeDemo />
+          {children}
+        </div>
       </main>
 
       <footer className="flex items-center justify-center gap-1.5 px-5 py-6 text-xs text-fg-subtle">
