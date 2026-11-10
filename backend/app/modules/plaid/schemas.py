@@ -7,6 +7,8 @@ from decimal import Decimal
 from pydantic import BaseModel, ConfigDict, Field
 
 
+accounts_skipped: int = 0
+
 class LinkTokenResponse(BaseModel):
     link_token: str
     expiration: str | None = None
